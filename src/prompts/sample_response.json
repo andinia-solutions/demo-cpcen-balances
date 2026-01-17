@@ -1,0 +1,131 @@
+{
+    "resumen_auditoria": {
+      "status_global": "OBSERVADO",
+      "conclusion_ia": "Se detectaron inconsistencias materiales en los cálculos del ejercicio 2024. Existen errores de suma en el Activo Corriente del ESP y en el subtotal de la Nota 2.2. Asimismo, se observa falta de uniformidad en las fechas de los informes entre las páginas de carátula/estados y las notas complementarias.",
+      "confianza_analisis": "Alto",
+      "empresa": "EMPRESA MODELO S.R.L.",
+      "cuit": "30-XXXXXXXX-7",
+      "ejercicio_finalizado": "30/06/20XX"
+    },
+    "checklist_data": [
+      {
+        "id": "1",
+        "item_text": "1. Revisión del tipeado a partir del borrador",
+        "estado_actual": "OK",
+        "estado_anterior": "OK",
+        "observaciones": "La información es consistente en su estructura general. Los datos en formato 'XXXX' se presentan de forma uniforme en los campos de Tomo y Folio[cite: 11, 21, 31, 41, 52, 76, 106, 118, 128, 132, 136]."
+      },
+      {
+        "id": "2",
+        "item_text": "2. Revisión de cálculos y sumas horizontales y verticales",
+        "estado_actual": "ERROR",
+        "estado_anterior": "OK",
+        "observaciones": "Error en suma de Activo Corriente 2024: Caja (13.846.319) + Otros Créditos (1.539.755) = 15.386.074, pero el balance informa 15.385.074[cite: 14]. Consecuentemente, el Total del Activo informado (126.448.132) difiere de la suma de sus partes (126.447.132)[cite: 14]. Nota 2.2 subtotal informa 1.529.755 pero los ítems suman 1.539.755[cite: 114]."
+      },
+      {
+        "id": "3.1.I",
+        "item_text": "3.1.I Estado de Situacion Patrimonial: Activo = Pasivo + Patrimonio Neto",
+        "estado_actual": "OK",
+        "estado_anterior": "OK",
+        "observaciones": "La igualdad contable se mantiene en los totales expuestos: 126.448.132 = 38.467.531 + 87.980.601[cite: 14]."
+      },
+      {
+        "id": "3.1.I.b",
+        "item_text": "Patrimonio Neto = Estado de Evolución del Patrimonio Neto",
+        "estado_actual": "OK",
+        "estado_anterior": "OK",
+        "observaciones": "El Patrimonio Neto al cierre (87.980.601) y al inicio (27.124.399) coinciden entre el ESP [cite: 14] y el EEPN[cite: 37]."
+      },
+      {
+        "id": "3.1.II",
+        "item_text": "II. Estado de Resultados: Resultado del ejercicio = Estado de Evolución del Patrimonio Neto",
+        "estado_actual": "OK",
+        "estado_anterior": "OK",
+        "observaciones": "El resultado neto de 60.856.202 es consistente entre el ER [cite: 27] y el EEPN[cite: 37]."
+      },
+      {
+        "id": "3.1.III.a",
+        "item_text": "III. Estado de Flujo de Efectivo: Estado de Situación Patrimonial (fondos al inicio / cierre)",
+        "estado_actual": "OK",
+        "estado_anterior": "OK",
+        "observaciones": "Los saldos de efectivo al inicio (2.062.922) y cierre (13.846.319) en el EFE [cite: 48] coinciden con el rubro Caja y Bancos del ESP[cite: 14]."
+      },
+      {
+        "id": "3.1.III.b",
+        "item_text": "III. Estado de Flujo de Efectivo: Estado de Resultados",
+        "estado_actual": "OK",
+        "estado_anterior": "OK",
+        "observaciones": "El resultado del ejercicio y el impuesto a las ganancias coinciden entre el EFE [cite: 48] y el ER[cite: 27]."
+      },
+      {
+        "id": "3.1.III.c",
+        "item_text": "III. Estado de Flujo de Efectivo: Estado de Evolución del Patrimonio Neto",
+        "estado_actual": "OK",
+        "estado_anterior": "OK",
+        "observaciones": "No se observan inconsistencias entre las causas de variación y el aporte de propietarios del EEPN[cite: 37, 48]."
+      },
+      {
+        "id": "3.2.I",
+        "item_text": "3.2.I Notas: Estado de Situación Patrimonial",
+        "estado_actual": "ERROR",
+        "estado_anterior": "OK",
+        "observaciones": "Inconsistencia en Nota 2.2: El subtotal de la nota (1.529.755) no coincide con el importe expuesto en el ESP (1.539.755)[cite: 14, 114]."
+      },
+      {
+        "id": "3.2.II",
+        "item_text": "3.2.II Notas: Estado de Resultados",
+        "estado_actual": "OK",
+        "estado_anterior": "OK",
+        "observaciones": "Los totales de gastos de administración y comercialización en el Anexo II coinciden con lo expuesto en el ER[cite: 27, 135]."
+      },
+      {
+        "id": "3.3",
+        "item_text": "3.3 Estados Contables con Anexos (Bienes de Uso, Gastos, etc)",
+        "estado_actual": "OK",
+        "estado_anterior": "OK",
+        "observaciones": "El valor residual de Bienes de Uso (111.062.058) coincide entre el ESP [cite: 14] y el Anexo I[cite: 131]."
+      },
+      {
+        "id": "3.4",
+        "item_text": "3.4 Notas con Notas (referencias e importes)",
+        "estado_actual": "OK",
+        "estado_anterior": "OK",
+        "observaciones": "La Nota 3 referencia correctamente los saldos de la Nota 2.6 respecto a partes relacionadas[cite: 125]."
+      },
+      {
+        "id": "3.5",
+        "item_text": "3.5 Notas con Anexos (referencias e importes)",
+        "estado_actual": "OK",
+        "estado_anterior": "OK",
+        "observaciones": "Las referencias a los Anexos I y II en las notas de valuación son correctas[cite: 93]."
+      },
+      {
+        "id": "3.6",
+        "item_text": "3.6 Anexos entre sí: Anexo Bienes de Uso / Cuadro de Gastos",
+        "estado_actual": "OK",
+        "estado_anterior": "OK",
+        "observaciones": "La amortización del ejercicio (5.551.255) es idéntica en el Anexo I [cite: 131] y el Anexo II[cite: 135]."
+      },
+      {
+        "id": "3.8",
+        "item_text": "3.8 Carátula con: Encabezamiento de EE.CC. y Nota sobre Estado del Capital",
+        "estado_actual": "OK",
+        "estado_anterior": "OK",
+        "observaciones": "Los datos de la carátula coinciden con el encabezado de los estados básicos[cite: 1, 4, 15]."
+      },
+      {
+        "id": "4-5",
+        "item_text": "4 y 5. Revisión de fechas, Informe del Auditor y datos de los firmantes",
+        "estado_actual": "ERROR",
+        "estado_anterior": "N/A",
+        "observaciones": "Inconsistencia en fechas de informe: Las páginas 7, 8, 9 y 10 indican '14/11/2024' [cite: 77, 107, 119, 129], mientras que el resto de las páginas utilizan el marcador 'XXXXXXXX'[cite: 13, 22, 33, 42, 54, 132, 136]."
+      },
+      {
+        "id": "6",
+        "item_text": "6. Verificación pase a libros rubricados",
+        "estado_actual": "N/A",
+        "estado_anterior": "N/A",
+        "observaciones": "PENDIENTE MANUAL"
+      }
+    ]
+  }
