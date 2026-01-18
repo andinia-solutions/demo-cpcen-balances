@@ -18,7 +18,6 @@ function App() {
   const [fileName, setFileName] = useState<string>('')
   const [result, setResult] = useState<ValidationResult | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [processingTime, setProcessingTime] = useState<number>(0)
 
   const handleFileSelect = useCallback(async (selectedFile: File) => {
     setFileName(selectedFile.name)
@@ -35,7 +34,6 @@ function App() {
       const endTime = Date.now()
       const time = (endTime - startTime) / 1000
       
-      setProcessingTime(time)
       setResult(validationResult)
       setScreen('results')
       
@@ -61,14 +59,12 @@ function App() {
       setFileName('')
       setResult(null)
       setError(null)
-      setProcessingTime(0)
     }
   }, [])
 
   const handleViewHistoryEntry = useCallback((entry: HistoryEntry) => {
     setFileName(entry.fileName)
     setResult(entry.result)
-    setProcessingTime(entry.processingTime)
     setScreen('results')
   }, [])
 

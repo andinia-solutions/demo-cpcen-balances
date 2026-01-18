@@ -1,4 +1,4 @@
-import { Moon, Bell, FileText } from 'lucide-react'
+import { FileText } from 'lucide-react'
 
 interface HeaderProps {
   title: string
