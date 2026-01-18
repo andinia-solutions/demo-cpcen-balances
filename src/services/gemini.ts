@@ -1,9 +1,6 @@
-import { GoogleGenerativeAI, SchemaType, type Schema } from '@google/generative-ai'
 import type { ValidationResult } from '../types/validation'
-// Import the system prompt from markdown file (Vite raw import)
-import SYSTEM_INSTRUCTION from '../prompts/system.md?raw'
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 // Custom error class for user-friendly error messages
 export class ValidationError extends Error {
@@ -13,146 +10,59 @@ export class ValidationError extends Error {
   }
 }
 
-// JSON Schema for structured output - enforces strict response format
-// Using type assertion due to SDK type limitations with complex nested schemas
-const VALIDATION_RESPONSE_SCHEMA = {
-  type: SchemaType.OBJECT,
-  properties: {
-    resumen_auditoria: {
-      type: SchemaType.OBJECT,
-      properties: {
-        status_global: {
-          type: SchemaType.STRING,
-          format: 'enum',
-          enum: ['APROBADO', 'OBSERVADO'],
-          description: 'Estado global de la auditoría',
-        },
-        conclusion_ia: {
-          type: SchemaType.STRING,
-          description: 'Resumen ejecutivo detallando la integridad del balance y hallazgos críticos',
-        },
-        confianza_analisis: {
-          type: SchemaType.STRING,
-          format: 'enum',
-          enum: ['Alto', 'Medio', 'Bajo'],
-          description: 'Nivel de confianza del análisis',
-        },
-        empresa: {
-          type: SchemaType.STRING,
-          description: 'Nombre de la empresa',
-        },
-        cuit: {
-          type: SchemaType.STRING,
-          description: 'CUIT de la empresa',
-        },
-        ejercicio_finalizado: {
-          type: SchemaType.STRING,
-          description: 'Fecha de cierre del ejercicio en formato DD/MM/AAAA',
-        },
-      },
-      required: ['status_global', 'conclusion_ia', 'confianza_analisis', 'empresa', 'cuit', 'ejercicio_finalizado'],
-    },
-    checklist_data: {
-      type: SchemaType.ARRAY,
-      items: {
-        type: SchemaType.OBJECT,
-        properties: {
-          id: {
-            type: SchemaType.STRING,
-            description: 'Identificador del punto del checklist',
-          },
-          item_text: {
-            type: SchemaType.STRING,
-            description: 'Texto literal del checklist',
-          },
-          estado_actual: {
-            type: SchemaType.STRING,
-            format: 'enum',
-            enum: ['OK', 'ERROR', 'N/A'],
-            description: 'Estado basado en el ejercicio actual',
-          },
-          estado_anterior: {
-            type: SchemaType.STRING,
-            format: 'enum',
-            enum: ['OK', 'ERROR', 'N/A'],
-            description: 'Estado basado en el ejercicio comparativo',
-          },
-          observaciones: {
-            type: SchemaType.STRING,
-            description: 'Explicación técnica detallada',
-          },
-        },
-        required: ['id', 'item_text', 'estado_actual', 'estado_anterior', 'observaciones'],
-      },
-      description: 'Array con los 17 items del checklist de validación',
-    },
-  },
-  required: ['resumen_auditoria', 'checklist_data'],
-}
-
 export async function validatePDF(file: File): Promise<ValidationResult> {
-  if (!API_KEY || API_KEY === 'your_api_key_here') {
-    // Return mock data if no API key is configured
-    console.warn('No API key configured. Returning mock data.')
+  if (!API_BASE_URL) {
+    // Return mock data if no API base URL is configured
+    console.warn('No API base URL configured. Returning mock data.')
     return getMockResult()
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(API_KEY)
-    const model = genAI.getGenerativeModel({ 
-      model: 'gemini-3-pro-preview',
-      systemInstruction: SYSTEM_INSTRUCTION,
-      generationConfig: {
-        responseMimeType: 'application/json',
-        responseSchema: VALIDATION_RESPONSE_SCHEMA as Schema,
-      },
+    // Create FormData with the PDF file
+    const formData = new FormData()
+    formData.append('pdf', file)
+
+    // Call the backend API
+    const response = await fetch(`${API_BASE_URL}/demos/cpcen/analyze`, {
+      method: 'POST',
+      body: formData,
     })
 
-    // Convert PDF to base64
-    const base64Data = await fileToBase64(file)
-
-    const result = await model.generateContent([
-      {
-        inlineData: {
-          mimeType: 'application/pdf',
-          data: base64Data,
-        },
-      },
-      'Analiza este estado contable y genera el informe de validación técnica.',
-    ])
-
-    const response = await result.response
-    const text = response.text()
-    
-    // With structured output, the response should be valid JSON directly
-    try {
-      const validationResult: ValidationResult = JSON.parse(text)
-      return validationResult
-    } catch (parseError) {
-      console.error('JSON parse error:', parseError, 'Response:', text)
-      throw new ValidationError('Error al interpretar los resultados del análisis. Por favor, intente nuevamente.')
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as { error?: string; message?: string }
+      
+      // Map HTTP status codes to user-friendly messages
+      if (response.status === 429) {
+        throw new ValidationError('El servicio está temporalmente saturado. Por favor, intente nuevamente en unos minutos.')
+      }
+      
+      if (response.status === 401 || response.status === 403) {
+        throw new ValidationError('Error de configuración del servicio. Contacte al administrador.')
+      }
+      
+      if (response.status === 503) {
+        throw new ValidationError(errorData.message || 'El servicio no está disponible temporalmente.')
+      }
+      
+      throw new ValidationError(errorData.message || 'Ocurrió un error al procesar el documento. Por favor, intente nuevamente.')
     }
+
+    const validationResult: ValidationResult = await response.json()
+    return validationResult
+
   } catch (error) {
     // Log the full error for debugging (only visible in console)
-    console.error('Gemini API error:', error)
+    console.error('API error:', error)
     
     // If it's already our custom error, re-throw it
     if (error instanceof ValidationError) {
       throw error
     }
 
-    // Map common API errors to user-friendly messages
+    // Map common errors to user-friendly messages
     const errorMessage = error instanceof Error ? error.message : String(error)
     
-    if (errorMessage.includes('429') || errorMessage.includes('quota')) {
-      throw new ValidationError('El servicio está temporalmente saturado. Por favor, intente nuevamente en unos minutos.')
-    }
-    
-    if (errorMessage.includes('401') || errorMessage.includes('403') || errorMessage.includes('API key')) {
-      throw new ValidationError('Error de configuración del servicio. Contacte al administrador.')
-    }
-    
-    if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+    if (errorMessage.includes('network') || errorMessage.includes('fetch') || errorMessage.includes('Failed to fetch')) {
       throw new ValidationError('Error de conexión. Verifique su conexión a internet e intente nuevamente.')
     }
     
@@ -165,21 +75,7 @@ export async function validatePDF(file: File): Promise<ValidationResult> {
   }
 }
 
-async function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => {
-      const result = reader.result as string
-      // Remove data URL prefix if present
-      const base64 = result.includes(',') ? result.split(',')[1] : result
-      resolve(base64)
-    }
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
-}
-
-// Mock data for development without API key
+// Mock data for development without API
 function getMockResult(): ValidationResult {
   return {
     resumen_auditoria: {
